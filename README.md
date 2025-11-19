@@ -4,7 +4,7 @@
 
 ---
 
-## What You're Getting
+## What is Taskflow Pro?
 
 This is a **fully functional, production-ready foundation** for a project management system with:
 
