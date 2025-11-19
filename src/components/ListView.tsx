@@ -12,9 +12,10 @@ interface ListViewProps {
   tasks: Task[]
   onTaskUpdate: (id: string, updates: Partial<Task>) => void
   onTaskDelete: (id: string) => void
+  onTaskSelect?: (task: Task) => void
 }
 
-export default function ListView({ tasks, onTaskUpdate, onTaskDelete }: ListViewProps) {
+export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSelect }: ListViewProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<TaskStatus | 'all'>('all')
 
@@ -65,7 +66,10 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete }: ListView
           filteredTasks.map((task) => (
             <Card key={task.id} className="p-4">
               <div className="flex items-start justify-between">
-                <div className="flex-1">
+                <div
+                  className="flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => onTaskSelect?.(task)}
+                >
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-lg">{task.title}</h3>
                     <Badge className={getStatusColor(task.status)}>

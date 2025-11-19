@@ -6,9 +6,10 @@ import { CheckCircle2, Clock, AlertCircle } from 'lucide-react'
 
 interface DashboardViewProps {
   tasks: Task[]
+  onTaskSelect?: (task: Task) => void
 }
 
-export default function DashboardView({ tasks }: DashboardViewProps) {
+export default function DashboardView({ tasks, onTaskSelect }: DashboardViewProps) {
   const stats = calculateTaskStats(tasks)
   const highPriorityTasks = tasks
     .filter((t) => ['high', 'urgent'].includes(t.priority) && t.status !== 'done')
@@ -75,7 +76,8 @@ export default function DashboardView({ tasks }: DashboardViewProps) {
               {highPriorityTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-start justify-between p-3 border rounded-lg hover:bg-slate-50"
+                  className="flex items-start justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                  onClick={() => onTaskSelect?.(task)}
                 >
                   <div className="flex-1">
                     <h4 className="font-medium">{task.title}</h4>

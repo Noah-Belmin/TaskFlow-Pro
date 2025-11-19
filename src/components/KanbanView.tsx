@@ -9,6 +9,7 @@ import { GripVertical } from 'lucide-react'
 interface KanbanViewProps {
   tasks: Task[]
   onTaskUpdate: (id: string, updates: Partial<Task>) => void
+  onTaskSelect?: (task: Task) => void
 }
 
 const COLUMNS: { status: TaskStatus; title: string; color: string }[] = [
@@ -18,7 +19,7 @@ const COLUMNS: { status: TaskStatus; title: string; color: string }[] = [
   { status: 'done', title: 'Done', color: 'bg-green-100' },
 ]
 
-export default function KanbanView({ tasks, onTaskUpdate }: KanbanViewProps) {
+export default function KanbanView({ tasks, onTaskUpdate, onTaskSelect }: KanbanViewProps) {
   const [draggedTask, setDraggedTask] = useState<string | null>(null)
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null)
 
@@ -108,7 +109,10 @@ export default function KanbanView({ tasks, onTaskUpdate }: KanbanViewProps) {
                   >
                     <div className="space-y-2">
                       {/* Drag Handle & Title */}
-                      <div className="flex items-start gap-2">
+                      <div
+                        className="flex items-start gap-2 cursor-pointer"
+                        onClick={() => onTaskSelect?.(task)}
+                      >
                         <GripVertical className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
                         <h4 className="font-medium text-sm flex-1">{task.title}</h4>
                       </div>

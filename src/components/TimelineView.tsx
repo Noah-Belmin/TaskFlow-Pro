@@ -7,9 +7,10 @@ import { Calendar, Clock } from 'lucide-react'
 interface TimelineViewProps {
   tasks: Task[]
   onTaskUpdate?: (id: string, updates: Partial<Task>) => void
+  onTaskSelect?: (task: Task) => void
 }
 
-export default function TimelineView({ tasks }: TimelineViewProps) {
+export default function TimelineView({ tasks, onTaskSelect }: TimelineViewProps) {
   // Get tasks with dates, sorted by start date
   const tasksWithDates = tasks
     .filter(task => task.startDate || task.dueDate)
@@ -136,7 +137,11 @@ export default function TimelineView({ tasks }: TimelineViewProps) {
                   return (
                     <div key={task.id} className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium flex-shrink-0 w-64 truncate" title={task.title}>
+                        <span
+                          className="text-sm font-medium flex-shrink-0 w-64 truncate cursor-pointer hover:text-blue-600 transition-colors"
+                          title={task.title}
+                          onClick={() => onTaskSelect?.(task)}
+                        >
                           {task.title}
                         </span>
                         <div className="flex gap-2 flex-shrink-0">
@@ -165,6 +170,7 @@ export default function TimelineView({ tasks }: TimelineViewProps) {
                             width: `${Math.max(duration, 3)}%`
                           }}
                           title={`${formatDate(start)} - ${formatDate(end)}\nProgress: ${task.completionPercentage || 0}%`}
+                          onClick={() => onTaskSelect?.(task)}
                         >
                           {/* Completion progress bar */}
                           {task.completionPercentage && task.completionPercentage > 0 && (
