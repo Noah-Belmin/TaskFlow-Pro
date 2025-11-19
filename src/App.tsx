@@ -4,12 +4,16 @@ import NewTaskModal from './components/NewTaskModal'
 import DashboardView from './components/DashboardView'
 import ListView from './components/ListView'
 import KanbanView from './components/KanbanView'
+import CalendarView from './components/CalendarView'
+import TimelineView from './components/TimelineView'
 import type { Task, ViewMode, NewTaskFormData } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
 import {
   LayoutDashboard,
   List,
   LayoutGrid,
+  Calendar,
+  Clock,
   Plus,
   Menu,
   X,
@@ -52,6 +56,9 @@ function App() {
       dueDate: formData.dueDate,
       startDate: formData.startDate,
       assignedTo: formData.assignedTo,
+      estimatedHours: formData.estimatedHours,
+      completionPercentage: formData.completionPercentage || 0,
+      blockedBy: formData.blockedBy || [],
       createdAt: new Date(),
       updatedAt: new Date(),
       comments: [],
@@ -103,6 +110,10 @@ function App() {
         )
       case 'kanban':
         return <KanbanView tasks={tasks} onTaskUpdate={updateTask} />
+      case 'calendar':
+        return <CalendarView tasks={tasks} onTaskUpdate={updateTask} />
+      case 'timeline':
+        return <TimelineView tasks={tasks} onTaskUpdate={updateTask} />
       default:
         return <DashboardView tasks={tasks} />
     }
@@ -149,6 +160,24 @@ function App() {
           >
             <LayoutGrid className="mr-2 h-4 w-4" />
             Kanban Board
+          </Button>
+
+          <Button
+            variant={currentView === 'calendar' ? 'secondary' : 'ghost'}
+            className="w-full justify-start"
+            onClick={() => setCurrentView('calendar')}
+          >
+            <Calendar className="mr-2 h-4 w-4" />
+            Calendar
+          </Button>
+
+          <Button
+            variant={currentView === 'timeline' ? 'secondary' : 'ghost'}
+            className="w-full justify-start"
+            onClick={() => setCurrentView('timeline')}
+          >
+            <Clock className="mr-2 h-4 w-4" />
+            Timeline
           </Button>
         </nav>
 

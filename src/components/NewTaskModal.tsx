@@ -31,6 +31,7 @@ export default function NewTaskModal({
     priority: 'medium',
     category: 'work',
     tags: [],
+    blockedBy: [],
   })
 
   const [tagInput, setTagInput] = useState('')
@@ -44,6 +45,14 @@ export default function NewTaskModal({
 
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required'
+    }
+
+    if (formData.estimatedHours && formData.estimatedHours < 0) {
+      newErrors.estimatedHours = 'Must be a positive number'
+    }
+
+    if (formData.completionPercentage && (formData.completionPercentage < 0 || formData.completionPercentage > 100)) {
+      newErrors.completionPercentage = 'Must be between 0 and 100'
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -61,6 +70,7 @@ export default function NewTaskModal({
       priority: 'medium',
       category: 'work',
       tags: [],
+      blockedBy: [],
     })
     setTagInput('')
     setErrors({})
@@ -75,6 +85,7 @@ export default function NewTaskModal({
       priority: 'medium',
       category: 'work',
       tags: [],
+      blockedBy: [],
     })
     setTagInput('')
     setErrors({})
@@ -107,7 +118,7 @@ export default function NewTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl" onClose={handleCancel}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" onClose={handleCancel}>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Task</DialogTitle>
@@ -249,6 +260,54 @@ export default function NewTaskModal({
                   setFormData({ ...formData, assignedTo: e.target.value })
                 }
               />
+            </div>
+
+            {/* Estimated Hours and Completion Percentage */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="estimatedHours">Estimated Hours</Label>
+                <Input
+                  id="estimatedHours"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  placeholder="e.g., 8"
+                  value={formData.estimatedHours || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      estimatedHours: e.target.value ? parseFloat(e.target.value) : undefined,
+                    })
+                  }
+                  className={errors.estimatedHours ? 'border-red-500' : ''}
+                />
+                {errors.estimatedHours && (
+                  <p className="text-sm text-red-500">{errors.estimatedHours}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="completionPercentage">Completion %</Label>
+                <Input
+                  id="completionPercentage"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  placeholder="e.g., 25"
+                  value={formData.completionPercentage || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      completionPercentage: e.target.value ? parseInt(e.target.value) : undefined,
+                    })
+                  }
+                  className={errors.completionPercentage ? 'border-red-500' : ''}
+                />
+                {errors.completionPercentage && (
+                  <p className="text-sm text-red-500">{errors.completionPercentage}</p>
+                )}
+              </div>
             </div>
 
             {/* Tags */}

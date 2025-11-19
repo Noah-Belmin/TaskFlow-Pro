@@ -207,4 +207,7 @@ export interface NewTaskFormData {
   startDate?: Date
   tags: string[]
   assignedTo?: string
+  estimatedHours?: number
+  completionPercentage?: number
+  blockedBy?: string[]
 }
