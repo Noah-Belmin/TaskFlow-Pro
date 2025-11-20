@@ -36,7 +36,7 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
       <Card className="p-4">
         <div className="flex gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
             <Input
               placeholder="Search tasks..."
               value={searchTerm}
@@ -62,7 +62,7 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
       {/* Task List */}
       <div className="space-y-3">
         {filteredTasks.length === 0 ? (
-          <Card className="p-8 text-center text-slate-500">
+          <Card className="p-8 text-center text-slate-500 dark:text-slate-400">
             No tasks found
           </Card>
         ) : (
@@ -74,7 +74,7 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
                   onClick={() => onTaskSelect?.(task)}
                 >
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg">{task.title}</h3>
+                    <h3 className="font-semibold text-lg dark:text-slate-100">{task.title}</h3>
                     <Badge className={getStatusColor(task.status)}>
                       {task.status}
                     </Badge>
@@ -87,10 +87,10 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
                   </div>
 
                   {task.description && (
-                    <p className="text-slate-600 mt-2">{task.description}</p>
+                    <p className="text-slate-600 dark:text-slate-400 mt-2">{task.description}</p>
                   )}
 
-                  <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
+                  <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 dark:text-slate-400">
                     {task.dueDate && (
                       <span>Due: {formatDate(task.dueDate)}</span>
                     )}
@@ -102,7 +102,7 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
                         {task.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-0.5 bg-slate-100 rounded text-xs"
+                            className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 dark:text-slate-300 rounded text-xs"
                           >
                             {tag}
                           </span>

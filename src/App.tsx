@@ -14,6 +14,7 @@ import type { Task, ViewMode, NewTaskFormData } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
 import { useTheme } from './context/ThemeContext'
+import { getSeedData, shouldLoadSeedData } from './seedData'
 import {
   LayoutDashboard,
   List,
@@ -47,6 +48,7 @@ function App() {
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [taskDetailOpen, setTaskDetailOpen] = useState(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -58,15 +60,21 @@ function App() {
       if (savedData.categories) {
         setCategories(savedData.categories)
       }
+    } else if (shouldLoadSeedData()) {
+      // Load seed data for first-time users or testing
+      const seedTasks = getSeedData()
+      setTasks(seedTasks)
+      saveToLocalStorage({ tasks: seedTasks, categories: DEFAULT_CATEGORIES })
     }
+    setIsInitialLoad(false)
   }, [])
 
-  // Save to localStorage whenever tasks or categories change
+  // Save to localStorage whenever tasks or categories change (skip initial render)
   useEffect(() => {
-    if (tasks.length > 0 || categories.length > 0) {
+    if (!isInitialLoad) {
       saveToLocalStorage({ tasks, categories })
     }
-  }, [tasks, categories])
+  }, [tasks, categories, isInitialLoad])
 
   // Task Operations
   const createTask = (formData: NewTaskFormData) => {
