@@ -8,6 +8,7 @@ import ListView from './components/ListView'
 import KanbanView from './components/KanbanView'
 import CalendarView from './components/CalendarView'
 import TimelineView from './components/TimelineView'
+import InfoView from './components/InfoView'
 import type { Task, ViewMode, NewTaskFormData } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
 import {
@@ -20,6 +21,9 @@ import {
   Menu,
   X,
   Download,
+  ChevronLeft,
+  ChevronRight,
+  Info,
 } from 'lucide-react'
 import { exportTasksToCSV } from './utils'
 
@@ -28,6 +32,7 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [taskDetailOpen, setTaskDetailOpen] = useState(false)
@@ -68,6 +73,7 @@ function App() {
       comments: [],
       attachments: [],
       checklist: [],
+      subtasks: [],
       customFields: {},
     }
 
@@ -148,6 +154,8 @@ function App() {
             onTaskSelect={handleTaskSelect}
           />
         )
+      case 'info':
+        return <InfoView />
       default:
         return <DashboardView tasks={tasks} onTaskSelect={handleTaskSelect} />
     }
@@ -158,82 +166,125 @@ function App() {
       {/* Sidebar */}
       <aside
         className={`
-          ${sidebarOpen ? 'w-64' : 'w-0'}
+          ${sidebarOpen ? (sidebarCollapsed ? 'w-16' : 'w-64') : 'w-0'}
           transition-all duration-300 bg-white border-r border-slate-200
           flex flex-col overflow-hidden
         `}
       >
-        <div className="p-6 border-b border-slate-200">
-          <h1 className="text-2xl font-bold text-blue-600">TaskFlow Pro</h1>
-          <p className="text-sm text-slate-600 mt-1">Project Management</p>
-        </div>
+        {!sidebarCollapsed && (
+          <div className="p-6 border-b border-slate-200">
+            <h1 className="text-2xl font-bold text-blue-600">TaskFlow Pro</h1>
+            <p className="text-sm text-slate-600 mt-1">Project Management</p>
+          </div>
+        )}
 
-        <nav className="flex-1 p-4 space-y-1">
+        {sidebarCollapsed && (
+          <div className="p-4 border-b border-slate-200 flex justify-center">
+            <h1 className="text-2xl font-bold text-blue-600">TF</h1>
+          </div>
+        )}
+
+        <nav className={`flex-1 ${sidebarCollapsed ? 'p-2' : 'p-4'} space-y-1`}>
           <Button
             variant={currentView === 'dashboard' ? 'secondary' : 'ghost'}
-            className="w-full justify-start gap-3 h-10"
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
             onClick={() => setCurrentView('dashboard')}
+            title="Dashboard"
           >
             <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-            <span>Dashboard</span>
+            {!sidebarCollapsed && <span>Dashboard</span>}
           </Button>
 
           <Button
             variant={currentView === 'list' ? 'secondary' : 'ghost'}
-            className="w-full justify-start gap-3 h-10"
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
             onClick={() => setCurrentView('list')}
+            title="List View"
           >
             <List className="h-4 w-4 flex-shrink-0" />
-            <span>List View</span>
+            {!sidebarCollapsed && <span>List View</span>}
           </Button>
 
           <Button
             variant={currentView === 'kanban' ? 'secondary' : 'ghost'}
-            className="w-full justify-start gap-3 h-10"
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
             onClick={() => setCurrentView('kanban')}
+            title="Kanban Board"
           >
             <LayoutGrid className="h-4 w-4 flex-shrink-0" />
-            <span>Kanban Board</span>
+            {!sidebarCollapsed && <span>Kanban Board</span>}
           </Button>
 
           <Button
             variant={currentView === 'calendar' ? 'secondary' : 'ghost'}
-            className="w-full justify-start gap-3 h-10"
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
             onClick={() => setCurrentView('calendar')}
+            title="Calendar"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span>Calendar</span>
+            {!sidebarCollapsed && <span>Calendar</span>}
           </Button>
 
           <Button
             variant={currentView === 'timeline' ? 'secondary' : 'ghost'}
-            className="w-full justify-start gap-3 h-10"
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
             onClick={() => setCurrentView('timeline')}
+            title="Timeline"
           >
             <Clock className="h-4 w-4 flex-shrink-0" />
-            <span>Timeline</span>
+            {!sidebarCollapsed && <span>Timeline</span>}
+          </Button>
+
+          <div className={`${sidebarCollapsed ? 'my-2' : 'my-4'} border-t border-slate-200`} />
+
+          <Button
+            variant={currentView === 'info' ? 'secondary' : 'ghost'}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            onClick={() => setCurrentView('info')}
+            title="Info & Help"
+          >
+            <Info className="h-4 w-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Info & Help</span>}
           </Button>
         </nav>
 
-        <div className="p-4 border-t border-slate-200">
-          <div className="space-y-2 text-sm text-slate-600">
-            <div className="flex justify-between">
-              <span>Total Tasks:</span>
-              <span className="font-semibold">{tasks.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>In Progress:</span>
-              <span className="font-semibold">
-                {tasks.filter((t) => t.status === 'in-progress').length}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Completed:</span>
-              <span className="font-semibold">
-                {tasks.filter((t) => t.status === 'done').length}
-              </span>
+        {!sidebarCollapsed && (
+          <div className="p-4 border-t border-slate-200">
+            <div className="space-y-2 text-sm text-slate-600">
+              <div className="flex justify-between">
+                <span>Total Tasks:</span>
+                <span className="font-semibold">{tasks.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>In Progress:</span>
+                <span className="font-semibold">
+                  {tasks.filter((t) => t.status === 'in-progress').length}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Completed:</span>
+                <span className="font-semibold">
+                  {tasks.filter((t) => t.status === 'done').length}
+                </span>
+              </div>
             </div>
           </div>
+        )}
+
+        <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'} border-t border-slate-200`}>
+          <Button
+            variant="ghost"
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-between'} h-10`}
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            {!sidebarCollapsed && <span className="text-sm text-slate-600">Collapse</span>}
+            {sidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4 text-slate-600" />
+            ) : (
+              <ChevronLeft className="h-4 w-4 text-slate-600" />
+            )}
+          </Button>
         </div>
       </aside>
 
