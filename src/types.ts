@@ -43,6 +43,7 @@ export interface Task {
   comments: Comment[]
   attachments: Attachment[]
   checklist: ChecklistItem[]
+  subtasks: Subtask[]
 
   // Custom
   customFields: Record<string, any>
@@ -83,6 +84,18 @@ export interface ChecklistItem {
   completed: boolean
   assignedTo?: string
   dueDate?: Date
+}
+
+export interface Subtask {
+  id: string
+  title: string
+  description?: string
+  status: TaskStatus
+  assignedTo?: string
+  dueDate?: Date
+  completedAt?: Date
+  createdAt: Date
+  estimatedHours?: number
 }
 
 // Agile Planning Types
@@ -130,7 +143,7 @@ export interface JobSite {
 }
 
 // View Types
-export type ViewMode = 'dashboard' | 'list' | 'kanban' | 'calendar' | 'timeline' | 'roadmap' | 'settings'
+export type ViewMode = 'dashboard' | 'list' | 'kanban' | 'calendar' | 'timeline' | 'roadmap' | 'settings' | 'info'
 
 // Settings Types
 export interface AppSettings {

@@ -19,7 +19,7 @@ import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { Select } from './ui/select'
 import { Badge } from './ui/badge'
-import type { Task, Comment, Attachment, TaskPriority, TaskCategory, TaskStatus } from '../types'
+import type { Task, Comment, Attachment, Subtask, TaskPriority, TaskCategory, TaskStatus } from '../types'
 import { formatDate, formatDateTime, getPriorityColor, getStatusColor, getCategoryColor } from '../utils'
 import {
   X,
@@ -36,6 +36,10 @@ import {
   Edit3,
   Save,
   XCircle,
+  Plus,
+  CheckCircle2,
+  Circle,
+  ListTodo,
 } from 'lucide-react'
 
 interface TaskDetailDrawerProps {
@@ -65,8 +69,12 @@ export default function TaskDetailDrawer({
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Subtasks state
+  const [subtasks, setSubtasks] = useState<Subtask[]>([])
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('')
+
   // Active tab state
-  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'attachments'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'attachments' | 'subtasks'>('details')
 
   // Update local state when task changes
   useEffect(() => {
@@ -74,6 +82,7 @@ export default function TaskDetailDrawer({
       setEditedTask(task)
       setComments(task.comments || [])
       setAttachments(task.attachments || [])
+      setSubtasks(task.subtasks || [])
     }
   }, [task])
 
@@ -165,6 +174,70 @@ export default function TaskDetailDrawer({
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  // Subtask handlers
+  const handleAddSubtask = () => {
+    if (!newSubtaskTitle.trim()) return
+
+    const newSubtask: Subtask = {
+      id: crypto.randomUUID(),
+      title: newSubtaskTitle,
+      status: 'todo',
+      createdAt: new Date(),
+    }
+
+    const updatedSubtasks = [...subtasks, newSubtask]
+    setSubtasks(updatedSubtasks)
+
+    // Calculate new progress based on subtasks
+    const completedSubtasks = updatedSubtasks.filter(st => st.status === 'done').length
+    const totalSubtasks = updatedSubtasks.length
+    const newProgress = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : 0
+
+    onUpdate(task.id, {
+      subtasks: updatedSubtasks,
+      completionPercentage: newProgress
+    })
+    setNewSubtaskTitle('')
+  }
+
+  const handleToggleSubtask = (subtaskId: string) => {
+    const updatedSubtasks = subtasks.map(st =>
+      st.id === subtaskId
+        ? {
+            ...st,
+            status: (st.status === 'done' ? 'todo' : 'done') as TaskStatus,
+            completedAt: st.status === 'done' ? undefined : new Date(),
+          }
+        : st
+    )
+    setSubtasks(updatedSubtasks)
+
+    // Calculate new progress
+    const completedSubtasks = updatedSubtasks.filter(st => st.status === 'done').length
+    const totalSubtasks = updatedSubtasks.length
+    const newProgress = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : 0
+
+    onUpdate(task.id, {
+      subtasks: updatedSubtasks,
+      completionPercentage: newProgress
+    })
+  }
+
+  const handleDeleteSubtask = (subtaskId: string) => {
+    const updatedSubtasks = subtasks.filter(st => st.id !== subtaskId)
+    setSubtasks(updatedSubtasks)
+
+    // Recalculate progress
+    const completedSubtasks = updatedSubtasks.filter(st => st.status === 'done').length
+    const totalSubtasks = updatedSubtasks.length
+    const newProgress = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : 0
+
+    onUpdate(task.id, {
+      subtasks: updatedSubtasks,
+      completionPercentage: newProgress
+    })
   }
 
   // ============================================================================
@@ -265,6 +338,22 @@ export default function TaskDetailDrawer({
               {attachments.length > 0 && (
                 <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-xs">
                   {attachments.length}
+                </span>
+              )}
+            </button>
+            <button
+              className={`pb-3 px-1 font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'subtasks'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              onClick={() => setActiveTab('subtasks')}
+            >
+              <ListTodo className="h-4 w-4" />
+              Subtasks
+              {subtasks.length > 0 && (
+                <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-xs">
+                  {subtasks.filter(st => st.status === 'done').length}/{subtasks.length}
                 </span>
               )}
             </button>
@@ -662,6 +751,99 @@ export default function TaskDetailDrawer({
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Subtasks Tab */}
+          {activeTab === 'subtasks' && (
+            <div className="space-y-4">
+              {/* Add Subtask */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a new subtask..."
+                  value={newSubtaskTitle}
+                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddSubtask()
+                    }
+                  }}
+                  className="flex-1"
+                />
+                <Button onClick={handleAddSubtask}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              </div>
+
+              {/* Progress Bar */}
+              {subtasks.length > 0 && (
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">Progress</span>
+                    <span className="text-slate-600">
+                      {subtasks.filter(st => st.status === 'done').length} of {subtasks.length} completed
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all"
+                      style={{
+                        width: `${subtasks.length > 0
+                          ? Math.round((subtasks.filter(st => st.status === 'done').length / subtasks.length) * 100)
+                          : 0}%`
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Subtasks List */}
+              <div className="space-y-2">
+                {subtasks.length === 0 ? (
+                  <div className="text-center py-8">
+                    <ListTodo className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                    <p className="text-slate-500">No subtasks yet</p>
+                    <p className="text-sm text-slate-400 mt-1">Break down this task into smaller steps</p>
+                  </div>
+                ) : (
+                  subtasks.map(subtask => (
+                    <div
+                      key={subtask.id}
+                      className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 group"
+                    >
+                      <button
+                        onClick={() => handleToggleSubtask(subtask.id)}
+                        className="flex-shrink-0"
+                      >
+                        {subtask.status === 'done' ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <Circle className="h-5 w-5 text-slate-300 group-hover:text-slate-400" />
+                        )}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm ${subtask.status === 'done' ? 'line-through text-slate-500' : 'text-slate-900'}`}>
+                          {subtask.title}
+                        </p>
+                        {subtask.completedAt && (
+                          <p className="text-xs text-slate-400 mt-1">
+                            Completed {formatDateTime(subtask.completedAt)}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleDeleteSubtask(subtask.id)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   ))
                 )}

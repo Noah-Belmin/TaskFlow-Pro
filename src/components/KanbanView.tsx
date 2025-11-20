@@ -103,8 +103,8 @@ export default function KanbanView({ tasks, onTaskUpdate, onTaskSelect }: Kanban
                     onDragStart={(e) => handleDragStart(e, task.id)}
                     onDragEnd={handleDragEnd}
                     className={`
-                      p-3 transition-all cursor-move
-                      ${draggedTask === task.id ? 'opacity-50' : 'hover:shadow-md'}
+                      p-3 transition-all cursor-move bg-white border-2
+                      ${draggedTask === task.id ? 'opacity-50' : 'hover:shadow-lg hover:border-blue-300'}
                     `}
                   >
                     <div className="space-y-2">
