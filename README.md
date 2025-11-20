@@ -283,21 +283,21 @@ These are all solvable—the framework is in place!
 
 ---
 
-## Roadmap (What You Can Add)
+## Roadmap (Features to Add)
 
 ### Phase 1: Core Views (Examples Provided)
-- [ ] Calendar View
-- [ ] Timeline View
-- [ ] Settings Panel
+- [x] Calendar View
+- [x] Timeline View
+- [x] Settings Panel
 
 ### Phase 2: Advanced Features
-- [ ] Drag & Drop Kanban
-- [ ] CSV Import UI
+- [x] Drag & Drop Kanban
+- [x] CSV Import UI
 - [ ] Custom Fields Management
 
 ### Phase 3: Collaboration
-- [ ] Comments System
-- [ ] File Attachments
+- [x] Comments System
+- [x] File Attachments
 - [ ] User Management
 
 ### Phase 4: Construction
