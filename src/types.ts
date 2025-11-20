@@ -146,7 +146,18 @@ export interface JobSite {
 }
 
 // View Types
-export type ViewMode = 'dashboard' | 'list' | 'kanban' | 'calendar' | 'timeline' | 'roadmap' | 'settings' | 'info'
+export type ViewMode = 'dashboard' | 'list' | 'kanban' | 'calendar' | 'timeline' | 'settings' | 'info'
+
+// User Profile
+export interface UserProfile {
+  name: string
+  email: string
+  role?: string
+  avatar?: string
+  dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
+  timeFormat: '12h' | '24h'
+  timezone?: string
+}
 
 // Settings Types
 export interface AppSettings {
