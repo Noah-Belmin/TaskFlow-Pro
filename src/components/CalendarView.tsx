@@ -9,9 +9,10 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-reac
 interface CalendarViewProps {
   tasks: Task[]
   onTaskUpdate?: (id: string, updates: Partial<Task>) => void
+  onTaskSelect?: (task: Task) => void
 }
 
-export default function CalendarView({ tasks }: CalendarViewProps) {
+export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
 
   // Get tasks for a specific date
@@ -109,10 +110,10 @@ export default function CalendarView({ tasks }: CalendarViewProps) {
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-2 auto-rows-fr">
           {days.map((date, index) => {
             if (!date) {
-              return <div key={`empty-${index}`} className="aspect-square" />
+              return <div key={`empty-${index}`} className="h-32 bg-slate-50 rounded-lg" />
             }
 
             const tasksForDay = getTasksForDate(date)
@@ -123,7 +124,7 @@ export default function CalendarView({ tasks }: CalendarViewProps) {
               <div
                 key={date.toISOString()}
                 className={`
-                  min-h-[120px] p-2 border-2 rounded-lg transition-all hover:shadow-md
+                  h-32 p-2 border-2 rounded-lg transition-all hover:shadow-md overflow-y-auto
                   ${isToday ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white'}
                   ${hasOverdueTasks ? 'border-red-300' : ''}
                 `}
@@ -141,6 +142,7 @@ export default function CalendarView({ tasks }: CalendarViewProps) {
                         hover:opacity-80 transition-opacity
                       `}
                       title={`${task.title}\n${task.description || 'No description'}\nStatus: ${task.status}`}
+                      onClick={() => onTaskSelect?.(task)}
                     >
                       <div className="font-medium truncate">{task.title}</div>
                       {task.assignedTo && (

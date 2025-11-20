@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Button } from './components/ui/button'
 import NewTaskModal from './components/NewTaskModal'
+import TaskDetailDrawer from './components/TaskDetailDrawer'
+import GlobalSearch from './components/GlobalSearch'
 import DashboardView from './components/DashboardView'
 import ListView from './components/ListView'
 import KanbanView from './components/KanbanView'
@@ -27,6 +29,8 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const [taskDetailOpen, setTaskDetailOpen] = useState(false)
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -95,27 +99,57 @@ function App() {
     URL.revokeObjectURL(url)
   }
 
+  const handleTaskSelect = (task: Task) => {
+    setSelectedTask(task)
+    setTaskDetailOpen(true)
+  }
+
+  const handleTaskDetailClose = () => {
+    setTaskDetailOpen(false)
+    // Delay clearing selectedTask to allow drawer close animation
+    setTimeout(() => setSelectedTask(null), 300)
+  }
+
   // Render current view
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <DashboardView tasks={tasks} />
+        return <DashboardView tasks={tasks} onTaskSelect={handleTaskSelect} />
       case 'list':
         return (
           <ListView
             tasks={tasks}
             onTaskUpdate={updateTask}
             onTaskDelete={deleteTask}
+            onTaskSelect={handleTaskSelect}
           />
         )
       case 'kanban':
-        return <KanbanView tasks={tasks} onTaskUpdate={updateTask} />
+        return (
+          <KanbanView
+            tasks={tasks}
+            onTaskUpdate={updateTask}
+            onTaskSelect={handleTaskSelect}
+          />
+        )
       case 'calendar':
-        return <CalendarView tasks={tasks} onTaskUpdate={updateTask} />
+        return (
+          <CalendarView
+            tasks={tasks}
+            onTaskUpdate={updateTask}
+            onTaskSelect={handleTaskSelect}
+          />
+        )
       case 'timeline':
-        return <TimelineView tasks={tasks} onTaskUpdate={updateTask} />
+        return (
+          <TimelineView
+            tasks={tasks}
+            onTaskUpdate={updateTask}
+            onTaskSelect={handleTaskSelect}
+          />
+        )
       default:
-        return <DashboardView tasks={tasks} />
+        return <DashboardView tasks={tasks} onTaskSelect={handleTaskSelect} />
     }
   }
 
@@ -134,50 +168,50 @@ function App() {
           <p className="text-sm text-slate-600 mt-1">Project Management</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-1">
           <Button
             variant={currentView === 'dashboard' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start gap-3 h-10"
             onClick={() => setCurrentView('dashboard')}
           >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
+            <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+            <span>Dashboard</span>
           </Button>
 
           <Button
             variant={currentView === 'list' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start gap-3 h-10"
             onClick={() => setCurrentView('list')}
           >
-            <List className="mr-2 h-4 w-4" />
-            List View
+            <List className="h-4 w-4 flex-shrink-0" />
+            <span>List View</span>
           </Button>
 
           <Button
             variant={currentView === 'kanban' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start gap-3 h-10"
             onClick={() => setCurrentView('kanban')}
           >
-            <LayoutGrid className="mr-2 h-4 w-4" />
-            Kanban Board
+            <LayoutGrid className="h-4 w-4 flex-shrink-0" />
+            <span>Kanban Board</span>
           </Button>
 
           <Button
             variant={currentView === 'calendar' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start gap-3 h-10"
             onClick={() => setCurrentView('calendar')}
           >
-            <Calendar className="mr-2 h-4 w-4" />
-            Calendar
+            <Calendar className="h-4 w-4 flex-shrink-0" />
+            <span>Calendar</span>
           </Button>
 
           <Button
             variant={currentView === 'timeline' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start gap-3 h-10"
             onClick={() => setCurrentView('timeline')}
           >
-            <Clock className="mr-2 h-4 w-4" />
-            Timeline
+            <Clock className="h-4 w-4 flex-shrink-0" />
+            <span>Timeline</span>
           </Button>
         </nav>
 
@@ -207,7 +241,7 @@ function App() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white border-b border-slate-200 p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -221,20 +255,25 @@ function App() {
                 )}
               </Button>
 
-              <h2 className="text-xl font-semibold capitalize">
+              <h2 className="text-xl font-semibold capitalize hidden md:block">
                 {currentView === 'kanban' ? 'Kanban Board' : currentView}
               </h2>
             </div>
 
+            {/* Global Search */}
+            <div className="flex-1 max-w-xl">
+              <GlobalSearch tasks={tasks} onTaskSelect={handleTaskSelect} />
+            </div>
+
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleExport}>
+              <Button variant="outline" onClick={handleExport} className="hidden sm:flex">
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
               </Button>
 
               <Button onClick={() => setNewTaskModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                New Task
+                <span className="hidden sm:inline">New Task</span>
               </Button>
             </div>
           </div>
@@ -249,6 +288,15 @@ function App() {
         open={newTaskModalOpen}
         onOpenChange={setNewTaskModalOpen}
         onCreateTask={createTask}
+      />
+
+      {/* Task Detail Drawer */}
+      <TaskDetailDrawer
+        task={selectedTask}
+        open={taskDetailOpen}
+        onClose={handleTaskDetailClose}
+        onUpdate={updateTask}
+        onDelete={deleteTask}
       />
     </div>
   )
