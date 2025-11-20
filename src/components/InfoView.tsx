@@ -1,5 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { getSeedData } from '../seedData'
+import { saveToLocalStorage } from '../utils'
 import {
   BookOpen,
   Keyboard,
@@ -10,16 +13,27 @@ import {
   Clock,
   Search,
   Plus,
-  Info
+  Info,
+  Database
 } from 'lucide-react'
 
 export default function InfoView() {
+  const handleLoadSampleData = () => {
+    const confirmLoad = window.confirm(
+      'This will replace all current tasks with sample data. Continue?'
+    )
+    if (confirmLoad) {
+      const seedTasks = getSeedData()
+      saveToLocalStorage({ tasks: seedTasks, categories: ['work', 'personal', 'health', 'learning', 'construction', 'other'] })
+      window.location.reload()
+    }
+  }
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">TaskFlow Pro Documentation</h1>
-        <p className="text-slate-600">Everything you need to know to master your productivity</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">TaskFlow Pro Documentation</h1>
+        <p className="text-slate-600 dark:text-slate-400">Everything you need to know to master your productivity</p>
       </div>
 
       {/* Getting Started */}
@@ -246,10 +260,32 @@ export default function InfoView() {
           <CardTitle>Data Storage</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-slate-400">
             All your data is stored locally in your browser using localStorage. Your tasks are
             automatically saved as you work and persist across sessions. No data is sent to external servers.
           </p>
+        </CardContent>
+      </Card>
+
+      {/* Developer Tools */}
+      <Card className="border-2 border-dashed border-slate-300 dark:border-slate-700">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Database className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <CardTitle>Developer Tools</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-semibold text-lg mb-2 dark:text-slate-100">Load Sample Data</h3>
+            <p className="text-slate-700 dark:text-slate-400 mb-4">
+              Load 10 sample tasks to test the application. This will replace your current data.
+            </p>
+            <Button onClick={handleLoadSampleData} variant="outline" className="gap-2">
+              <Database className="h-4 w-4" />
+              Load Sample Data
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

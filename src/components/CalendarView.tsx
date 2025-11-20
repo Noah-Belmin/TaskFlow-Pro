@@ -71,8 +71,8 @@ export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps)
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5 text-blue-600" />
-            <h2 className="text-2xl font-bold">{monthName}</h2>
+            <CalendarIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-2xl font-bold dark:text-slate-100">{monthName}</h2>
           </div>
           <div className="flex gap-2">
             <Button
@@ -103,7 +103,7 @@ export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps)
         {/* Day headers */}
         <div className="grid grid-cols-7 gap-2 mb-4">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center font-semibold text-sm text-slate-700 py-2">
+            <div key={day} className="text-center font-semibold text-sm text-slate-700 dark:text-slate-300 py-2">
               {day}
             </div>
           ))}
@@ -113,7 +113,7 @@ export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps)
         <div className="grid grid-cols-7 gap-2 auto-rows-fr">
           {days.map((date, index) => {
             if (!date) {
-              return <div key={`empty-${index}`} className="h-32 bg-slate-50 rounded-lg" />
+              return <div key={`empty-${index}`} className="h-32 bg-slate-50 dark:bg-slate-900 rounded-lg" />
             }
 
             const tasksForDay = getTasksForDate(date)
@@ -124,12 +124,14 @@ export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps)
               <div
                 key={date.toISOString()}
                 className={`
-                  h-32 p-2 border-2 rounded-lg transition-all hover:shadow-md overflow-y-auto
-                  ${isToday ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white'}
-                  ${hasOverdueTasks ? 'border-red-300' : ''}
+                  h-32 p-2 border-2 rounded-lg transition-all hover:shadow-md dark:hover:shadow-slate-700 overflow-y-auto
+                  ${isToday
+                    ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/30'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50'}
+                  ${hasOverdueTasks ? 'border-red-300 dark:border-red-700' : ''}
                 `}
               >
-                <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>
+                <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>
                   {date.getDate()}
                 </div>
                 <div className="space-y-1">
@@ -153,7 +155,7 @@ export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps)
                     </div>
                   ))}
                   {tasksForDay.length > 3 && (
-                    <div className="text-xs text-slate-600 font-medium pl-1">
+                    <div className="text-xs text-slate-600 dark:text-slate-400 font-medium pl-1">
                       +{tasksForDay.length - 3} more
                     </div>
                   )}
@@ -166,20 +168,20 @@ export default function CalendarView({ tasks, onTaskSelect }: CalendarViewProps)
 
       {/* Legend */}
       <Card className="p-4">
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-6 text-sm dark:text-slate-300 flex-wrap">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-blue-500 bg-blue-50 rounded"></div>
+            <div className="w-4 h-4 border-2 border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/30 rounded"></div>
             <span>Today</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-red-300 rounded"></div>
+            <div className="w-4 h-4 border-2 border-red-300 dark:border-red-700 rounded"></div>
             <span>Has Overdue Tasks</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className="bg-red-100 text-red-800">Urgent</Badge>
-            <Badge className="bg-orange-100 text-orange-800">High</Badge>
-            <Badge className="bg-yellow-100 text-yellow-800">Medium</Badge>
-            <Badge className="bg-gray-100 text-gray-800">Low</Badge>
+            <Badge className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">Urgent</Badge>
+            <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">High</Badge>
+            <Badge className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">Medium</Badge>
+            <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">Low</Badge>
           </div>
         </div>
       </Card>

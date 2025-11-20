@@ -387,8 +387,15 @@ export const shouldLoadSeedData = (): boolean => {
     if (!data) return true
 
     const parsed = JSON.parse(data)
-    return !parsed.tasks || parsed.tasks.length === 0
+    // Load seed data if tasks don't exist or array is empty
+    return !parsed.tasks || !Array.isArray(parsed.tasks) || parsed.tasks.length === 0
   } catch {
     return true
   }
+}
+
+// Helper to force reload seed data (for development/testing)
+export const clearAndLoadSeedData = (): void => {
+  localStorage.removeItem('taskflow-pro-data')
+  console.log('Cleared localStorage. Reload page to load seed data.')
 }
