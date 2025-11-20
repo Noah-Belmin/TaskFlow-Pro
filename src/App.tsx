@@ -9,6 +9,7 @@ import ListView from './components/ListView'
 import KanbanView from './components/KanbanView'
 import CalendarView from './components/CalendarView'
 import TimelineView from './components/TimelineView'
+import SettingsView from './components/SettingsView'
 import InfoView from './components/InfoView'
 import type { Task, ViewMode, NewTaskFormData } from './types'
 import { DEFAULT_CATEGORIES } from './types'
@@ -31,6 +32,7 @@ import {
   Tag,
   Moon,
   Sun,
+  Settings,
 } from 'lucide-react'
 import { exportTasksToCSV } from './utils'
 
@@ -178,6 +180,8 @@ function App() {
             onTaskSelect={handleTaskSelect}
           />
         )
+      case 'settings':
+        return <SettingsView />
       case 'info':
         return <InfoView />
       default:
@@ -259,7 +263,17 @@ function App() {
             {!sidebarCollapsed && <span className="flex-1">Timeline</span>}
           </Button>
 
-          <div className={`${sidebarCollapsed ? 'my-2' : 'my-4'} border-t border-slate-200`} />
+          <div className={`${sidebarCollapsed ? 'my-2' : 'my-4'} border-t border-slate-200 dark:border-slate-700`} />
+
+          <Button
+            variant={currentView === 'settings' ? 'secondary' : 'ghost'}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
+            onClick={() => setCurrentView('settings')}
+            title="Settings"
+          >
+            <Settings className="h-4 w-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span className="flex-1">Settings</span>}
+          </Button>
 
           <Button
             variant={currentView === 'info' ? 'secondary' : 'ghost'}
