@@ -4,6 +4,7 @@ import { Input } from './ui/input'
 import { Select } from './ui/select'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
+import ConfirmDialog from './ConfirmDialog'
 import type { Task, TaskStatus } from '../types'
 import { formatDate, getStatusColor, getPriorityColor, getCategoryColor } from '../utils'
 import { Search, Trash2 } from 'lucide-react'
@@ -18,6 +19,8 @@ interface ListViewProps {
 export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSelect }: ListViewProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<TaskStatus | 'all'>('all')
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
 
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
@@ -128,9 +131,8 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
                     variant="destructive"
                     size="icon"
                     onClick={() => {
-                      if (confirm('Are you sure you want to delete this task?')) {
-                        onTaskDelete(task.id)
-                      }
+                      setTaskToDelete(task.id)
+                      setDeleteConfirmOpen(true)
                     }}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -141,6 +143,27 @@ export default function ListView({ tasks, onTaskUpdate, onTaskDelete, onTaskSele
           ))
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        onConfirm={() => {
+          if (taskToDelete) {
+            onTaskDelete(taskToDelete)
+          }
+          setDeleteConfirmOpen(false)
+          setTaskToDelete(null)
+        }}
+        onCancel={() => {
+          setDeleteConfirmOpen(false)
+          setTaskToDelete(null)
+        }}
+      />
     </div>
   )
 }
