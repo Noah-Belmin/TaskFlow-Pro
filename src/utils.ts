@@ -28,6 +28,24 @@ export const loadFromLocalStorage = (): any | null => {
         dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
         startDate: task.startDate ? new Date(task.startDate) : undefined,
         completedAt: task.completedAt ? new Date(task.completedAt) : undefined,
+        // Convert dates in comments
+        comments: task.comments?.map((comment: any) => ({
+          ...comment,
+          createdAt: new Date(comment.createdAt),
+          updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : undefined,
+        })) || [],
+        // Convert dates in attachments
+        attachments: task.attachments?.map((attachment: any) => ({
+          ...attachment,
+          uploadedAt: new Date(attachment.uploadedAt),
+        })) || [],
+        // Convert dates in subtasks
+        subtasks: task.subtasks?.map((subtask: any) => ({
+          ...subtask,
+          createdAt: new Date(subtask.createdAt),
+          completedAt: subtask.completedAt ? new Date(subtask.completedAt) : undefined,
+          dueDate: subtask.dueDate ? new Date(subtask.dueDate) : undefined,
+        })) || [],
       }))
     }
 
@@ -266,7 +284,21 @@ export const calculateTaskStats = (tasks: Task[]) => {
     done: completed,
   }
 
-  const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0
+  // Calculate weighted completion rate including subtasks
+  let totalCompletion = 0
+  tasks.forEach(task => {
+    if (task.status === 'done') {
+      totalCompletion += 100
+    } else if (task.completionPercentage !== undefined && task.completionPercentage > 0) {
+      // Use task's completion percentage which is auto-calculated from subtasks
+      totalCompletion += task.completionPercentage
+    } else if (task.status === 'in-progress') {
+      // Give partial credit for in-progress tasks without subtasks
+      totalCompletion += 10
+    }
+  })
+
+  const completionRate = total > 0 ? Math.round(totalCompletion / total) : 0
 
   return {
     total,

@@ -187,64 +187,64 @@ function App() {
         <nav className={`flex-1 ${sidebarCollapsed ? 'p-2' : 'p-4'} space-y-1`}>
           <Button
             variant={currentView === 'dashboard' ? 'secondary' : 'ghost'}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
             onClick={() => setCurrentView('dashboard')}
             title="Dashboard"
           >
             <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Dashboard</span>}
+            {!sidebarCollapsed && <span className="flex-1">Dashboard</span>}
           </Button>
 
           <Button
             variant={currentView === 'list' ? 'secondary' : 'ghost'}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
             onClick={() => setCurrentView('list')}
             title="List View"
           >
             <List className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>List View</span>}
+            {!sidebarCollapsed && <span className="flex-1">List View</span>}
           </Button>
 
           <Button
             variant={currentView === 'kanban' ? 'secondary' : 'ghost'}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
             onClick={() => setCurrentView('kanban')}
             title="Kanban Board"
           >
             <LayoutGrid className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Kanban Board</span>}
+            {!sidebarCollapsed && <span className="flex-1">Kanban Board</span>}
           </Button>
 
           <Button
             variant={currentView === 'calendar' ? 'secondary' : 'ghost'}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
             onClick={() => setCurrentView('calendar')}
             title="Calendar"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Calendar</span>}
+            {!sidebarCollapsed && <span className="flex-1">Calendar</span>}
           </Button>
 
           <Button
             variant={currentView === 'timeline' ? 'secondary' : 'ghost'}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
             onClick={() => setCurrentView('timeline')}
             title="Timeline"
           >
             <Clock className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Timeline</span>}
+            {!sidebarCollapsed && <span className="flex-1">Timeline</span>}
           </Button>
 
           <div className={`${sidebarCollapsed ? 'my-2' : 'my-4'} border-t border-slate-200`} />
 
           <Button
             variant={currentView === 'info' ? 'secondary' : 'ghost'}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start'} gap-3 h-10`}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
             onClick={() => setCurrentView('info')}
             title="Info & Help"
           >
             <Info className="h-4 w-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Info & Help</span>}
+            {!sidebarCollapsed && <span className="flex-1">Info & Help</span>}
           </Button>
         </nav>
 
