@@ -57,6 +57,12 @@ export interface Task {
   blockedBy?: string[]
   isLocked?: boolean
   isFavorite?: boolean
+
+  // Cost Tracking
+  estimatedCost?: number
+  actualCost?: number
+  costBreakdown?: CostItem[]
+  billable?: boolean
 }
 
 // Collaboration Types
@@ -79,6 +85,17 @@ export interface Attachment {
   size: number
   uploadedBy: string
   uploadedAt: Date
+  description?: string
+  category?: 'document' | 'image' | 'video' | 'other'
+}
+
+export interface CostItem {
+  id: string
+  description: string
+  amount: number
+  date: Date
+  category: string
+  receipt?: string
 }
 
 export interface ChecklistItem {
@@ -146,7 +163,7 @@ export interface JobSite {
 }
 
 // View Types
-export type ViewMode = 'dashboard' | 'list' | 'kanban' | 'calendar' | 'timeline' | 'settings' | 'info'
+export type ViewMode = 'dashboard' | 'list' | 'kanban' | 'calendar' | 'timeline' | 'automation' | 'settings' | 'info'
 
 // User Profile
 export interface UserProfile {
@@ -222,6 +239,38 @@ export interface ImportError {
   row: number
   field: string
   message: string
+}
+
+// Automation Rule Types
+export type RuleTrigger = 'status_changed' | 'priority_changed' | 'due_date_approaching' | 'assigned' | 'created'
+export type RuleCondition = 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains'
+export type RuleAction = 'set_status' | 'set_priority' | 'assign_to' | 'add_tag' | 'send_notification'
+
+export interface AutomationRule {
+  id: string
+  name: string
+  description?: string
+  enabled: boolean
+  trigger: RuleTrigger
+  conditions: RuleConditionItem[]
+  actions: RuleActionItem[]
+  createdAt: Date
+  updatedAt: Date
+  lastTriggered?: Date
+  triggerCount: number
+}
+
+export interface RuleConditionItem {
+  id: string
+  field: string
+  operator: RuleCondition
+  value: any
+}
+
+export interface RuleActionItem {
+  id: string
+  action: RuleAction
+  parameters: Record<string, any>
 }
 
 // New Task Form Data

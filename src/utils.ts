@@ -104,33 +104,33 @@ export const isDueSoon = (date: Date | undefined, days: number = 3): boolean => 
 
 export const getStatusColor = (status: TaskStatus): string => {
   const colors = {
-    todo: 'bg-slate-100 text-slate-800',
-    'in-progress': 'bg-blue-100 text-blue-800',
-    review: 'bg-purple-100 text-purple-800',
-    blocked: 'bg-red-100 text-red-800',
-    done: 'bg-green-100 text-green-800',
+    todo: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-100',
+    'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',
+    review: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100',
+    blocked: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
+    done: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
   }
   return colors[status] || colors.todo
 }
 
 export const getPriorityColor = (priority: TaskPriority): string => {
   const colors = {
-    low: 'bg-gray-100 text-gray-800',
-    medium: 'bg-yellow-100 text-yellow-800',
-    high: 'bg-orange-100 text-orange-800',
-    urgent: 'bg-red-100 text-red-800',
+    low: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
+    medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100',
+    high: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100',
+    urgent: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
   }
   return colors[priority] || colors.medium
 }
 
 export const getCategoryColor = (category: string): string => {
   const colors: Record<string, string> = {
-    work: 'bg-blue-100 text-blue-800',
-    personal: 'bg-purple-100 text-purple-800',
-    health: 'bg-green-100 text-green-800',
-    learning: 'bg-indigo-100 text-indigo-800',
-    construction: 'bg-orange-100 text-orange-800',
-    other: 'bg-gray-100 text-gray-800',
+    work: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',
+    personal: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100',
+    health: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
+    learning: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100',
+    construction: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100',
+    other: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
   }
   return colors[category] || colors.other
 }

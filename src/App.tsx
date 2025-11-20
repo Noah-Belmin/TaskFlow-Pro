@@ -11,7 +11,8 @@ import CalendarView from './components/CalendarView'
 import TimelineView from './components/TimelineView'
 import SettingsView from './components/SettingsView'
 import InfoView from './components/InfoView'
-import type { Task, ViewMode, NewTaskFormData } from './types'
+import RuleBuilder from './components/RuleBuilder'
+import type { Task, ViewMode, NewTaskFormData, AutomationRule } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
 import { useTheme } from './context/ThemeContext'
@@ -33,6 +34,7 @@ import {
   Moon,
   Sun,
   Settings,
+  Zap,
 } from 'lucide-react'
 import { exportTasksToCSV } from './utils'
 
@@ -43,6 +45,7 @@ function App() {
   // State
   const [tasks, setTasks] = useState<Task[]>([])
   const [categories, setCategories] = useState<string[]>([...DEFAULT_CATEGORIES])
+  const [automationRules, setAutomationRules] = useState<AutomationRule[]>([])
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -62,11 +65,14 @@ function App() {
       if (savedData.categories) {
         setCategories(savedData.categories)
       }
+      if (savedData.automationRules) {
+        setAutomationRules(savedData.automationRules)
+      }
     } else if (shouldLoadSeedData()) {
       // Load seed data for first-time users or testing
       const seedTasks = getSeedData()
       setTasks(seedTasks)
-      saveToLocalStorage({ tasks: seedTasks, categories: DEFAULT_CATEGORIES })
+      saveToLocalStorage({ tasks: seedTasks, categories: DEFAULT_CATEGORIES, automationRules: [] })
     }
     setIsInitialLoad(false)
   }, [])
@@ -74,9 +80,9 @@ function App() {
   // Save to localStorage whenever tasks or categories change (skip initial render)
   useEffect(() => {
     if (!isInitialLoad) {
-      saveToLocalStorage({ tasks, categories })
+      saveToLocalStorage({ tasks, categories, automationRules })
     }
-  }, [tasks, categories, isInitialLoad])
+  }, [tasks, categories, automationRules, isInitialLoad])
 
   // Task Operations
   const createTask = (formData: NewTaskFormData) => {
@@ -142,6 +148,36 @@ function App() {
     setTimeout(() => setSelectedTask(null), 300)
   }
 
+  // Automation Rule Operations
+  const createAutomationRule = (rule: Omit<AutomationRule, 'id' | 'createdAt' | 'updatedAt' | 'triggerCount'>) => {
+    const newRule: AutomationRule = {
+      ...rule,
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      triggerCount: 0,
+    }
+    setAutomationRules([...automationRules, newRule])
+  }
+
+  const updateAutomationRule = (id: string, updates: Partial<AutomationRule>) => {
+    setAutomationRules(
+      automationRules.map((rule) =>
+        rule.id === id
+          ? { ...rule, ...updates, updatedAt: new Date() }
+          : rule
+      )
+    )
+  }
+
+  const deleteAutomationRule = (id: string) => {
+    setAutomationRules(automationRules.filter((rule) => rule.id !== id))
+  }
+
+  const toggleAutomationRule = (id: string, enabled: boolean) => {
+    updateAutomationRule(id, { enabled })
+  }
+
   // Render current view
   const renderView = () => {
     switch (currentView) {
@@ -178,6 +214,16 @@ function App() {
             tasks={tasks}
             onTaskUpdate={updateTask}
             onTaskSelect={handleTaskSelect}
+          />
+        )
+      case 'automation':
+        return (
+          <RuleBuilder
+            rules={automationRules}
+            onCreateRule={createAutomationRule}
+            onUpdateRule={updateAutomationRule}
+            onDeleteRule={deleteAutomationRule}
+            onToggleRule={toggleAutomationRule}
           />
         )
       case 'settings':
@@ -261,6 +307,18 @@ function App() {
           >
             <Clock className="h-4 w-4 flex-shrink-0" />
             {!sidebarCollapsed && <span className="flex-1">Timeline</span>}
+          </Button>
+
+          <div className={`${sidebarCollapsed ? 'my-2' : 'my-4'} border-t border-slate-200 dark:border-slate-700`} />
+
+          <Button
+            variant={currentView === 'automation' ? 'secondary' : 'ghost'}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3'} gap-3 h-10 text-left`}
+            onClick={() => setCurrentView('automation')}
+            title="Automation"
+          >
+            <Zap className="h-4 w-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span className="flex-1">Automation</span>}
           </Button>
 
           <div className={`${sidebarCollapsed ? 'my-2' : 'my-4'} border-t border-slate-200 dark:border-slate-700`} />
