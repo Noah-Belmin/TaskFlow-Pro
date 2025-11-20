@@ -37,7 +37,7 @@ export function DialogContent({ className, children, onClose }: DialogContentPro
   return (
     <div
       className={cn(
-        'relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full mx-4',
+        'relative bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 max-w-lg w-full mx-4',
         className
       )}
       onClick={(e) => e.stopPropagation()}
@@ -45,7 +45,7 @@ export function DialogContent({ className, children, onClose }: DialogContentPro
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
+          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity dark:text-slate-200"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
@@ -76,7 +76,7 @@ interface DialogTitleProps {
 
 export function DialogTitle({ className, children }: DialogTitleProps) {
   return (
-    <h2 className={cn('text-lg font-semibold leading-none tracking-tight', className)}>
+    <h2 className={cn('text-lg font-semibold leading-none tracking-tight dark:text-slate-100', className)}>
       {children}
     </h2>
   )
@@ -89,7 +89,7 @@ interface DialogDescriptionProps {
 
 export function DialogDescription({ className, children }: DialogDescriptionProps) {
   return (
-    <p className={cn('text-sm text-slate-500', className)}>
+    <p className={cn('text-sm text-slate-500 dark:text-slate-400', className)}>
       {children}
     </p>
   )

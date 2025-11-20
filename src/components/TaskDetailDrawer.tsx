@@ -19,6 +19,7 @@ import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { Select } from './ui/select'
 import { Badge } from './ui/badge'
+import ConfirmDialog from './ConfirmDialog'
 import type { Task, Comment, Attachment, Subtask, TaskPriority, TaskCategory, TaskStatus } from '../types'
 import { formatDate, formatDateTime, getPriorityColor, getStatusColor, getCategoryColor } from '../utils'
 import {
@@ -72,6 +73,11 @@ export default function TaskDetailDrawer({
   // Subtasks state
   const [subtasks, setSubtasks] = useState<Subtask[]>([])
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('')
+
+  // Delete confirmation state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deleteSubtaskConfirmOpen, setDeleteSubtaskConfirmOpen] = useState(false)
+  const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null)
 
   // Active tab state
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'attachments' | 'subtasks'>('details')
@@ -608,12 +614,7 @@ export default function TaskDetailDrawer({
                 <div className="pt-4 border-t border-slate-200">
                   <Button
                     variant="destructive"
-                    onClick={() => {
-                      if (confirm('Are you sure you want to delete this task?')) {
-                        onDelete(task.id)
-                        onClose()
-                      }
-                    }}
+                    onClick={() => setDeleteConfirmOpen(true)}
                     className="w-full"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
@@ -839,7 +840,10 @@ export default function TaskDetailDrawer({
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => handleDeleteSubtask(subtask.id)}
+                        onClick={() => {
+                          setSubtaskToDelete(subtask.id)
+                          setDeleteSubtaskConfirmOpen(true)
+                        }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -852,6 +856,49 @@ export default function TaskDetailDrawer({
           )}
         </div>
       </div>
+
+      {/* Delete Task Confirmation Dialog */}
+      {task && (
+        <ConfirmDialog
+          open={deleteConfirmOpen}
+          title="Delete Task"
+          message={`Are you sure you want to delete "${task.title}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          variant="destructive"
+          onConfirm={() => {
+            if (onDelete) {
+              onDelete(task.id)
+              onClose()
+            }
+            setDeleteConfirmOpen(false)
+          }}
+          onCancel={() => {
+            setDeleteConfirmOpen(false)
+          }}
+        />
+      )}
+
+      {/* Delete Subtask Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteSubtaskConfirmOpen}
+        title="Delete Subtask"
+        message="Are you sure you want to delete this subtask? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        onConfirm={() => {
+          if (subtaskToDelete) {
+            handleDeleteSubtask(subtaskToDelete)
+          }
+          setDeleteSubtaskConfirmOpen(false)
+          setSubtaskToDelete(null)
+        }}
+        onCancel={() => {
+          setDeleteSubtaskConfirmOpen(false)
+          setSubtaskToDelete(null)
+        }}
+      />
     </>
   )
 }
