@@ -13,6 +13,7 @@ import InfoView from './components/InfoView'
 import type { Task, ViewMode, NewTaskFormData } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
+import { useTheme } from './context/ThemeContext'
 import {
   LayoutDashboard,
   List,
@@ -27,10 +28,15 @@ import {
   ChevronRight,
   Info,
   Tag,
+  Moon,
+  Sun,
 } from 'lucide-react'
 import { exportTasksToCSV } from './utils'
 
 function App() {
+  // Theme
+  const { theme, toggleTheme } = useTheme()
+
   // State
   const [tasks, setTasks] = useState<Task[]>([])
   const [categories, setCategories] = useState<string[]>([...DEFAULT_CATEGORIES])
@@ -172,25 +178,25 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-100">
+    <div className="flex h-screen bg-slate-100 dark:bg-slate-900">
       {/* Sidebar */}
       <aside
         className={`
           ${sidebarOpen ? (sidebarCollapsed ? 'w-16' : 'w-64') : 'w-0'}
-          transition-all duration-300 bg-white border-r border-slate-200
+          transition-all duration-300 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700
           flex flex-col overflow-hidden
         `}
       >
         {!sidebarCollapsed && (
-          <div className="p-6 border-b border-slate-200">
-            <h1 className="text-2xl font-bold text-blue-600">TaskFlow Pro</h1>
-            <p className="text-sm text-slate-600 mt-1">Project Management</p>
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">TaskFlow Pro</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Project Management</p>
           </div>
         )}
 
         {sidebarCollapsed && (
-          <div className="p-4 border-b border-slate-200 flex justify-center">
-            <h1 className="text-2xl font-bold text-blue-600">TF</h1>
+          <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-center">
+            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">TF</h1>
           </div>
         )}
 
@@ -259,8 +265,8 @@ function App() {
         </nav>
 
         {!sidebarCollapsed && (
-          <div className="p-4 border-t border-slate-200">
-            <div className="space-y-2 text-sm text-slate-600">
+          <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <div className="flex justify-between">
                 <span>Total Tasks:</span>
                 <span className="font-semibold">{tasks.length}</span>
@@ -281,18 +287,18 @@ function App() {
           </div>
         )}
 
-        <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'} border-t border-slate-200`}>
+        <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'} border-t border-slate-200 dark:border-slate-700`}>
           <Button
             variant="ghost"
             className={`w-full ${sidebarCollapsed ? 'justify-center px-0' : 'justify-between'} h-10`}
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
-            {!sidebarCollapsed && <span className="text-sm text-slate-600">Collapse</span>}
+            {!sidebarCollapsed && <span className="text-sm text-slate-600 dark:text-slate-400">Collapse</span>}
             {sidebarCollapsed ? (
-              <ChevronRight className="h-4 w-4 text-slate-600" />
+              <ChevronRight className="h-4 w-4 text-slate-600 dark:text-slate-400" />
             ) : (
-              <ChevronLeft className="h-4 w-4 text-slate-600" />
+              <ChevronLeft className="h-4 w-4 text-slate-600 dark:text-slate-400" />
             )}
           </Button>
         </div>
@@ -301,7 +307,7 @@ function App() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-slate-200 p-4">
+        <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Button
@@ -316,7 +322,7 @@ function App() {
                 )}
               </Button>
 
-              <h2 className="text-xl font-semibold capitalize hidden md:block">
+              <h2 className="text-xl font-semibold capitalize hidden md:block dark:text-slate-100">
                 {currentView === 'kanban' ? 'Kanban Board' : currentView}
               </h2>
             </div>
@@ -330,6 +336,11 @@ function App() {
               <Button variant="outline" onClick={() => setCategoryManagerOpen(true)} className="hidden lg:flex">
                 <Tag className="mr-2 h-4 w-4" />
                 Categories
+              </Button>
+
+              <Button variant="outline" onClick={toggleTheme} className="hidden md:flex">
+                {theme === 'dark' ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                {theme === 'dark' ? 'Light' : 'Dark'}
               </Button>
 
               <Button variant="outline" onClick={handleExport} className="hidden sm:flex">

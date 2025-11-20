@@ -107,18 +107,18 @@ export default function CategoryManager({
       >
         {/* Modal */}
         <div
-          className="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col"
+          className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Tag className="h-5 w-5 text-blue-600" />
+              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <Tag className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Manage Categories</h2>
-                <p className="text-sm text-slate-500">Add, edit, or remove task categories</p>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Manage Categories</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Add, edit, or remove task categories</p>
               </div>
             </div>
             <Button
@@ -134,7 +134,7 @@ export default function CategoryManager({
           <div className="flex-1 overflow-y-auto p-6">
             {/* Add New Category */}
             <div className="mb-6">
-              <label className="text-sm font-medium text-slate-700 mb-2 block">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
                 Add New Category
               </label>
               <div className="flex gap-2">
@@ -158,12 +158,12 @@ export default function CategoryManager({
 
             {/* Categories List */}
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
                 Current Categories ({localCategories.length})
               </label>
               <div className="space-y-2">
                 {localCategories.length === 0 ? (
-                  <Card className="p-8 text-center text-slate-500">
+                  <Card className="p-8 text-center text-slate-500 dark:text-slate-400">
                     No categories yet. Add one above to get started.
                   </Card>
                 ) : (
@@ -204,8 +204,8 @@ export default function CategoryManager({
                       ) : (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Tag className="h-4 w-4 text-slate-400" />
-                            <span className="font-medium capitalize">{category}</span>
+                            <Tag className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                            <span className="font-medium capitalize dark:text-slate-200">{category}</span>
                           </div>
                           <div className="flex gap-1">
                             <Button
@@ -234,7 +234,7 @@ export default function CategoryManager({
           </div>
 
           {/* Footer */}
-          <div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+          <div className="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
             <Button variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
