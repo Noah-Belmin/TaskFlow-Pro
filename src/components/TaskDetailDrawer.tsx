@@ -76,6 +76,8 @@ export default function TaskDetailDrawer({
 
   // Delete confirmation state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deleteSubtaskConfirmOpen, setDeleteSubtaskConfirmOpen] = useState(false)
+  const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null)
 
   // Active tab state
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'attachments' | 'subtasks'>('details')
@@ -838,7 +840,10 @@ export default function TaskDetailDrawer({
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => handleDeleteSubtask(subtask.id)}
+                        onClick={() => {
+                          setSubtaskToDelete(subtask.id)
+                          setDeleteSubtaskConfirmOpen(true)
+                        }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -852,7 +857,7 @@ export default function TaskDetailDrawer({
         </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Task Confirmation Dialog */}
       {task && (
         <ConfirmDialog
           open={deleteConfirmOpen}
@@ -873,6 +878,27 @@ export default function TaskDetailDrawer({
           }}
         />
       )}
+
+      {/* Delete Subtask Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteSubtaskConfirmOpen}
+        title="Delete Subtask"
+        message="Are you sure you want to delete this subtask? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="destructive"
+        onConfirm={() => {
+          if (subtaskToDelete) {
+            handleDeleteSubtask(subtaskToDelete)
+          }
+          setDeleteSubtaskConfirmOpen(false)
+          setSubtaskToDelete(null)
+        }}
+        onCancel={() => {
+          setDeleteSubtaskConfirmOpen(false)
+          setSubtaskToDelete(null)
+        }}
+      />
     </>
   )
 }
