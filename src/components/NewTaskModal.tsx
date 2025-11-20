@@ -18,12 +18,14 @@ interface NewTaskModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onCreateTask: (taskData: NewTaskFormData) => void
+  categories?: string[]
 }
 
 export default function NewTaskModal({
   open,
   onOpenChange,
   onCreateTask,
+  categories = ['work', 'personal', 'health', 'learning', 'construction', 'other'],
 }: NewTaskModalProps) {
   const [formData, setFormData] = useState<NewTaskFormData>({
     title: '',
@@ -196,12 +198,11 @@ export default function NewTaskModal({
                     })
                   }
                 >
-                  <option value="work">Work</option>
-                  <option value="personal">Personal</option>
-                  <option value="health">Health</option>
-                  <option value="learning">Learning</option>
-                  <option value="construction">Construction</option>
-                  <option value="other">Other</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
                 </Select>
               </div>
             </div>

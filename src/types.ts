@@ -1,7 +1,10 @@
 // Core Task Types
 export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'blocked' | 'done'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
-export type TaskCategory = 'work' | 'personal' | 'health' | 'learning' | 'construction' | 'other'
+export type TaskCategory = string // Support custom categories
+
+// Default categories
+export const DEFAULT_CATEGORIES = ['work', 'personal', 'health', 'learning', 'construction', 'other'] as const
 
 export interface Task {
   // Core Identifiers

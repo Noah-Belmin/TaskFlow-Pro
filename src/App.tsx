@@ -3,6 +3,7 @@ import { Button } from './components/ui/button'
 import NewTaskModal from './components/NewTaskModal'
 import TaskDetailDrawer from './components/TaskDetailDrawer'
 import GlobalSearch from './components/GlobalSearch'
+import CategoryManager from './components/CategoryManager'
 import DashboardView from './components/DashboardView'
 import ListView from './components/ListView'
 import KanbanView from './components/KanbanView'
@@ -10,6 +11,7 @@ import CalendarView from './components/CalendarView'
 import TimelineView from './components/TimelineView'
 import InfoView from './components/InfoView'
 import type { Task, ViewMode, NewTaskFormData } from './types'
+import { DEFAULT_CATEGORIES } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
 import {
   LayoutDashboard,
@@ -24,33 +26,41 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
+  Tag,
 } from 'lucide-react'
 import { exportTasksToCSV } from './utils'
 
 function App() {
   // State
   const [tasks, setTasks] = useState<Task[]>([])
+  const [categories, setCategories] = useState<string[]>([...DEFAULT_CATEGORIES])
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false)
+  const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [taskDetailOpen, setTaskDetailOpen] = useState(false)
 
   // Load data from localStorage on mount
   useEffect(() => {
     const savedData = loadFromLocalStorage()
-    if (savedData && savedData.tasks) {
-      setTasks(savedData.tasks)
+    if (savedData) {
+      if (savedData.tasks) {
+        setTasks(savedData.tasks)
+      }
+      if (savedData.categories) {
+        setCategories(savedData.categories)
+      }
     }
   }, [])
 
-  // Save to localStorage whenever tasks change
+  // Save to localStorage whenever tasks or categories change
   useEffect(() => {
-    if (tasks.length > 0) {
-      saveToLocalStorage({ tasks })
+    if (tasks.length > 0 || categories.length > 0) {
+      saveToLocalStorage({ tasks, categories })
     }
-  }, [tasks])
+  }, [tasks, categories])
 
   // Task Operations
   const createTask = (formData: NewTaskFormData) => {
@@ -317,6 +327,11 @@ function App() {
             </div>
 
             <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setCategoryManagerOpen(true)} className="hidden lg:flex">
+                <Tag className="mr-2 h-4 w-4" />
+                Categories
+              </Button>
+
               <Button variant="outline" onClick={handleExport} className="hidden sm:flex">
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
@@ -339,6 +354,7 @@ function App() {
         open={newTaskModalOpen}
         onOpenChange={setNewTaskModalOpen}
         onCreateTask={createTask}
+        categories={categories}
       />
 
       {/* Task Detail Drawer */}
@@ -348,6 +364,16 @@ function App() {
         onClose={handleTaskDetailClose}
         onUpdate={updateTask}
         onDelete={deleteTask}
+      />
+
+      {/* Category Manager */}
+      <CategoryManager
+        open={categoryManagerOpen}
+        onClose={() => setCategoryManagerOpen(false)}
+        categories={categories}
+        onUpdateCategories={(newCategories) => {
+          setCategories(newCategories)
+        }}
       />
     </div>
   )
