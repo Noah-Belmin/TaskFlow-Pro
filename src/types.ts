@@ -174,6 +174,7 @@ export interface UserProfile {
   dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD'
   timeFormat: '12h' | '24h'
   timezone?: string
+  currency?: 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'AUD' | 'CHF' | 'CNY' | 'INR'
 }
 
 // Settings Types

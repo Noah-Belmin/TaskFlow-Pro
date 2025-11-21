@@ -1,16 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Badge } from './ui/badge'
-import type { CostItem } from '../types'
+import type { CostItem, UserProfile } from '../types'
 import { DollarSign, Plus, Trash2, Receipt, TrendingUp, TrendingDown } from 'lucide-react'
 import { formatDate } from '../utils'
 
 interface CostTrackingProps {
   estimatedCost?: number
-  actualCost?: number
   costBreakdown: CostItem[]
   billable?: boolean
   onUpdateEstimatedCost: (cost: number) => void
@@ -21,7 +20,6 @@ interface CostTrackingProps {
 
 export default function CostTracking({
   estimatedCost = 0,
-  actualCost = 0,
   costBreakdown,
   billable = false,
   onUpdateEstimatedCost,
@@ -36,6 +34,20 @@ export default function CostTracking({
     category: '',
     date: new Date().toISOString().split('T')[0],
   })
+  const [currency, setCurrency] = useState<string>('USD')
+
+  useEffect(() => {
+    // Load currency from user profile settings
+    const savedProfile = localStorage.getItem('taskflow-user-profile')
+    if (savedProfile) {
+      try {
+        const profile: UserProfile = JSON.parse(savedProfile)
+        setCurrency(profile.currency || 'USD')
+      } catch (error) {
+        console.error('Error loading currency from profile:', error)
+      }
+    }
+  }, [])
 
   const totalActual = costBreakdown.reduce((sum, item) => sum + item.amount, 0)
   const variance = estimatedCost - totalActual
@@ -69,9 +81,22 @@ export default function CostTracking({
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    // Get locale based on currency
+    const localeMap: Record<string, string> = {
+      USD: 'en-US',
+      EUR: 'de-DE',
+      GBP: 'en-GB',
+      JPY: 'ja-JP',
+      CAD: 'en-CA',
+      AUD: 'en-AU',
+      CHF: 'de-CH',
+      CNY: 'zh-CN',
+      INR: 'en-IN',
+    }
+
+    return new Intl.NumberFormat(localeMap[currency] || 'en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currency,
     }).format(amount)
   }
 
@@ -87,6 +112,7 @@ export default function CostTracking({
           <div className="flex items-center gap-2">
             <Input
               type="number"
+              inputMode="decimal"
               value={estimatedCost || ''}
               onChange={(e) => onUpdateEstimatedCost(parseFloat(e.target.value) || 0)}
               placeholder="0.00"
@@ -194,6 +220,7 @@ export default function CostTracking({
                 <Label>Amount</Label>
                 <Input
                   type="number"
+                  inputMode="decimal"
                   value={newCost.amount}
                   onChange={(e) => setNewCost({ ...newCost, amount: e.target.value })}
                   placeholder="0.00"
