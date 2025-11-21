@@ -5,7 +5,7 @@ import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Select } from './ui/select'
 import type { UserProfile } from '../types'
-import { User, Upload, Download, Save, Settings as SettingsIcon } from 'lucide-react'
+import { User, Upload, Download, Save, Settings as SettingsIcon, Database, Cloud, HardDrive } from 'lucide-react'
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'Current User',
@@ -13,7 +13,8 @@ const DEFAULT_PROFILE: UserProfile = {
   role: '',
   dateFormat: 'MM/DD/YYYY',
   timeFormat: '12h',
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+  currency: 'USD'
 }
 
 export default function SettingsView() {
@@ -234,7 +235,7 @@ Another Task,Another description,in-progress,medium,personal,Jane Smith,2025-12-
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="dateFormat">Date Format</Label>
               <Select
@@ -268,6 +269,25 @@ Another Task,Another description,in-progress,medium,personal,Jane Smith,2025-12-
                 value={profile.timezone || ''}
                 onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency</Label>
+              <Select
+                id="currency"
+                value={profile.currency || 'USD'}
+                onChange={(e) => setProfile({ ...profile, currency: e.target.value as UserProfile['currency'] })}
+              >
+                <option value="USD">🇺🇸 USD - US Dollar</option>
+                <option value="EUR">🇪🇺 EUR - Euro</option>
+                <option value="GBP">🇬🇧 GBP - British Pound</option>
+                <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
+                <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+                <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+                <option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+                <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+                <option value="INR">🇮🇳 INR - Indian Rupee</option>
+              </Select>
             </div>
           </div>
 
@@ -332,6 +352,83 @@ Another Task,Another description,in-progress,medium,personal,Jane Smith,2025-12-
                 <strong>Tags:</strong> Separate multiple tags with semicolons (e.g., "tag1;tag2;tag3")
               </p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Storage Information */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Database className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <CardTitle>Storage & Data</CardTitle>
+          </div>
+          <CardDescription>Current storage method and future options</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Current Storage */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <HardDrive className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <h3 className="font-semibold dark:text-slate-100">Current Storage: Browser LocalStorage</h3>
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+              All your data is currently stored in your browser's local storage. This means:
+            </p>
+            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 ml-4">
+              <li>✅ Works offline and is fast</li>
+              <li>✅ Your data stays on your device</li>
+              <li>⚠️ Limited to this browser and device only</li>
+              <li>⚠️ Data will be lost if browser data is cleared</li>
+              <li>⚠️ No sync across devices or team collaboration</li>
+            </ul>
+          </div>
+
+          {/* Storage Limit */}
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Database className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <h3 className="font-semibold dark:text-slate-100">Storage Limit</h3>
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Browser localStorage typically allows 5-10MB of data. For most users, this is sufficient for thousands of tasks.
+              If you need more storage or cross-device sync, see the options below.
+            </p>
+          </div>
+
+          {/* Future Options */}
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Cloud className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <h3 className="font-semibold dark:text-slate-100">Cloud Storage Options (Coming Soon)</h3>
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+              We're exploring cloud storage solutions to enable:
+            </p>
+            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 ml-4 mb-3">
+              <li>☁️ Automatic sync across all your devices</li>
+              <li>🤝 Team collaboration features</li>
+              <li>💾 Automatic cloud backups</li>
+              <li>📱 Mobile app support</li>
+              <li>🔄 Real-time updates</li>
+            </ul>
+            <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
+              <p className="text-sm text-blue-900 dark:text-blue-100">
+                <strong>Options under consideration:</strong> Firebase (real-time sync), Supabase (PostgreSQL),
+                Self-hosted solutions, and hybrid approaches. See <code className="text-xs bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">STORAGE_OPTIONS.md</code> for details.
+              </p>
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+            <h3 className="font-semibold mb-2 dark:text-slate-100">💡 Current Recommendations</h3>
+            <ol className="text-sm text-slate-600 dark:text-slate-400 space-y-2 ml-4 list-decimal">
+              <li><strong>Backup regularly:</strong> Export your tasks using the CSV export feature above</li>
+              <li><strong>Don't clear browser data:</strong> Avoid clearing your browser's cache/cookies</li>
+              <li><strong>Use bookmarks:</strong> Bookmark this page to always return to your data</li>
+              <li><strong>Single device:</strong> Stick to one browser/device until cloud sync is available</li>
+            </ol>
           </div>
         </CardContent>
       </Card>

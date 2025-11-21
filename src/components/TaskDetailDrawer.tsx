@@ -926,7 +926,6 @@ export default function TaskDetailDrawer({
           {activeTab === 'costs' && task && (
             <CostTracking
               estimatedCost={task.estimatedCost}
-              actualCost={task.actualCost}
               costBreakdown={task.costBreakdown || []}
               billable={task.billable}
               onUpdateEstimatedCost={(cost) => {
