@@ -79,9 +79,9 @@ export default function KanbanView({ tasks, onTaskUpdate, onTaskSelect }: Kanban
             {/* Column Content - Drop Zone */}
             <div
               className={`
-                flex-1 bg-slate-50 p-2 space-y-2 overflow-y-auto rounded-b-lg
+                flex-1 bg-slate-50 dark:bg-slate-900 p-2 space-y-2 overflow-y-auto rounded-b-lg
                 transition-all duration-200
-                ${isDropTarget ? 'bg-blue-100 ring-2 ring-blue-400' : ''}
+                ${isDropTarget ? 'bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-400' : ''}
               `}
               onDragOver={(e) => handleDragOver(e, column.status)}
               onDragLeave={handleDragLeave}
@@ -147,13 +147,13 @@ export default function KanbanView({ tasks, onTaskUpdate, onTaskSelect }: Kanban
                         )}
                         {task.completionPercentage !== undefined && task.completionPercentage > 0 && (
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-blue-500 transition-all"
                                 style={{ width: `${task.completionPercentage}%` }}
                               />
                             </div>
-                            <span className="text-xs text-slate-600">
+                            <span className="text-xs text-slate-600 dark:text-slate-400">
                               {task.completionPercentage}%
                             </span>
                           </div>
@@ -166,7 +166,7 @@ export default function KanbanView({ tasks, onTaskUpdate, onTaskSelect }: Kanban
                           {task.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="px-1.5 py-0.5 bg-slate-200 rounded text-xs"
+                              className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 dark:text-slate-100 rounded text-xs"
                             >
                               {tag}
                             </span>

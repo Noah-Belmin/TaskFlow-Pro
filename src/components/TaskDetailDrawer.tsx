@@ -20,7 +20,9 @@ import { Label } from './ui/label'
 import { Select } from './ui/select'
 import { Badge } from './ui/badge'
 import ConfirmDialog from './ConfirmDialog'
-import type { Task, Comment, Attachment, Subtask, TaskPriority, TaskCategory, TaskStatus } from '../types'
+import DocumentManagement from './DocumentManagement'
+import CostTracking from './CostTracking'
+import type { Task, Comment, Attachment, Subtask, TaskPriority, TaskCategory, TaskStatus, CostItem } from '../types'
 import { formatDate, formatDateTime, getPriorityColor, getStatusColor, getCategoryColor } from '../utils'
 import {
   X,
@@ -41,6 +43,8 @@ import {
   CheckCircle2,
   Circle,
   ListTodo,
+  FileText,
+  DollarSign,
 } from 'lucide-react'
 
 interface TaskDetailDrawerProps {
@@ -80,7 +84,7 @@ export default function TaskDetailDrawer({
   const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null)
 
   // Active tab state
-  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'attachments' | 'subtasks'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'attachments' | 'subtasks' | 'documents' | 'costs'>('details')
 
   // Update local state when task changes
   useEffect(() => {
@@ -362,6 +366,33 @@ export default function TaskDetailDrawer({
                   {subtasks.filter(st => st.status === 'done').length}/{subtasks.length}
                 </span>
               )}
+            </button>
+            <button
+              className={`pb-3 px-1 font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'documents'
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+              onClick={() => setActiveTab('documents')}
+            >
+              <FileText className="h-4 w-4" />
+              Documents
+              {attachments.length > 0 && (
+                <span className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full text-xs">
+                  {attachments.length}
+                </span>
+              )}
+            </button>
+            <button
+              className={`pb-3 px-1 font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'costs'
+                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+              onClick={() => setActiveTab('costs')}
+            >
+              <DollarSign className="h-4 w-4" />
+              Costs
             </button>
           </div>
         </div>
@@ -853,6 +884,78 @@ export default function TaskDetailDrawer({
                 )}
               </div>
             </div>
+          )}
+
+          {/* Documents Tab */}
+          {activeTab === 'documents' && task && (
+            <DocumentManagement
+              attachments={attachments}
+              onUpload={async (file, description, category) => {
+                // Simulate file upload (in real app, upload to server)
+                const newAttachment: Attachment = {
+                  id: crypto.randomUUID(),
+                  name: file.name,
+                  url: URL.createObjectURL(file),
+                  type: file.type,
+                  size: file.size,
+                  uploadedBy: 'Current User',
+                  uploadedAt: new Date(),
+                  description,
+                  category,
+                }
+                const updatedAttachments = [...attachments, newAttachment]
+                setAttachments(updatedAttachments)
+                onUpdate(task.id, { attachments: updatedAttachments })
+              }}
+              onDelete={(id) => {
+                const updatedAttachments = attachments.filter(att => att.id !== id)
+                setAttachments(updatedAttachments)
+                onUpdate(task.id, { attachments: updatedAttachments })
+              }}
+              onDownload={(attachment) => {
+                // Download file
+                const a = document.createElement('a')
+                a.href = attachment.url
+                a.download = attachment.name
+                a.click()
+              }}
+            />
+          )}
+
+          {/* Costs Tab */}
+          {activeTab === 'costs' && task && (
+            <CostTracking
+              estimatedCost={task.estimatedCost}
+              actualCost={task.actualCost}
+              costBreakdown={task.costBreakdown || []}
+              billable={task.billable}
+              onUpdateEstimatedCost={(cost) => {
+                onUpdate(task.id, { estimatedCost: cost })
+              }}
+              onUpdateBillable={(billable) => {
+                onUpdate(task.id, { billable })
+              }}
+              onAddCostItem={(item) => {
+                const newCostItem: CostItem = {
+                  ...item,
+                  id: crypto.randomUUID(),
+                }
+                const updatedCostBreakdown = [...(task.costBreakdown || []), newCostItem]
+                const actualCost = updatedCostBreakdown.reduce((sum, item) => sum + item.amount, 0)
+                onUpdate(task.id, {
+                  costBreakdown: updatedCostBreakdown,
+                  actualCost,
+                })
+              }}
+              onDeleteCostItem={(id) => {
+                const updatedCostBreakdown = (task.costBreakdown || []).filter(item => item.id !== id)
+                const actualCost = updatedCostBreakdown.reduce((sum, item) => sum + item.amount, 0)
+                onUpdate(task.id, {
+                  costBreakdown: updatedCostBreakdown,
+                  actualCost,
+                })
+              }}
+            />
           )}
         </div>
       </div>
