@@ -15,6 +15,8 @@ import RuleBuilder from './components/RuleBuilder'
 import type { Task, ViewMode, NewTaskFormData, AutomationRule } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { saveToLocalStorage, loadFromLocalStorage } from './utils'
+import { executeAutomationRules, updateRuleTriggerCount } from './utils/automationEngine'
+import { getCurrentUserId } from './utils/userProfile'
 import { useTheme } from './context/ThemeContext'
 import { getSeedData, shouldLoadSeedData } from './seedData'
 import {
@@ -100,6 +102,7 @@ function App() {
       estimatedHours: formData.estimatedHours,
       completionPercentage: formData.completionPercentage || 0,
       blockedBy: formData.blockedBy || [],
+      createdBy: getCurrentUserId(), // Set creator from user profile
       createdAt: new Date(),
       updatedAt: new Date(),
       comments: [],
@@ -109,16 +112,43 @@ function App() {
       customFields: {},
     }
 
-    setTasks([...tasks, newTask])
+    // Execute automation rules for new task (trigger: 'created')
+    const { task: taskWithAutomation, triggeredRules } = executeAutomationRules(
+      undefined,
+      newTask,
+      automationRules
+    )
+
+    // Update rule trigger counts
+    if (triggeredRules.length > 0) {
+      setAutomationRules(updateRuleTriggerCount(automationRules, triggeredRules))
+    }
+
+    setTasks([...tasks, taskWithAutomation])
   }
 
   const updateTask = (id: string, updates: Partial<Task>) => {
     setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? { ...task, ...updates, updatedAt: new Date() }
-          : task
-      )
+      tasks.map((task) => {
+        if (task.id !== id) return task
+
+        // Create the updated task with manual updates
+        const manuallyUpdatedTask = { ...task, ...updates, updatedAt: new Date() }
+
+        // Execute automation rules on the updated task
+        const { task: taskWithAutomation, triggeredRules } = executeAutomationRules(
+          task,
+          manuallyUpdatedTask,
+          automationRules
+        )
+
+        // Update rule trigger counts if any rules were triggered
+        if (triggeredRules.length > 0) {
+          setAutomationRules(updateRuleTriggerCount(automationRules, triggeredRules))
+        }
+
+        return taskWithAutomation
+      })
     )
   }
 

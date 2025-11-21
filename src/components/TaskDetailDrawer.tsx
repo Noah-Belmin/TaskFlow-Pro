@@ -135,11 +135,26 @@ export default function TaskDetailDrawer({
   const handleAddComment = () => {
     if (!newComment.trim()) return
 
+    // Get current user info from profile
+    const savedProfile = localStorage.getItem('taskflow-user-profile')
+    let userName = 'Current User'
+    let userId = 'current-user'
+
+    if (savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile)
+        userName = profile.name || 'Current User'
+        userId = profile.email || 'current-user'
+      } catch (error) {
+        console.error('Error loading user profile for comment:', error)
+      }
+    }
+
     const comment: Comment = {
       id: crypto.randomUUID(),
       taskId: task.id,
-      userId: 'current-user', // TODO: Get from auth context
-      userName: 'Current User', // TODO: Get from auth context
+      userId,
+      userName,
       content: newComment,
       createdAt: new Date(),
     }
